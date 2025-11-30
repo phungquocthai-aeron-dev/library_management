@@ -3,6 +3,8 @@ const router = express.Router();
 const bookController = require("../controllers/book.controller");
 const upload = require("../middlewares/upload");
 
+router.get("/search", bookController.search);
+
 router
   .route("/")
   .get(bookController.getAll)
@@ -15,7 +17,5 @@ router
   .delete(bookController.delete);
 
 router.delete("/:id/hard", bookController.hardDelete);
-
-router.get("/search", bookController.search);
 
 module.exports = router;

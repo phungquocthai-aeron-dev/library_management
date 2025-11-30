@@ -39,8 +39,8 @@ class AuthController {
 
   async loginReader(req, res, next) {
     try {
-      const { id, password } = req.body;
-      const userDTO = await AuthService.loginReader(req, id, password);
+      const { phone, password } = req.body;
+      const userDTO = await AuthService.loginReader(req, phone, password);
 
       res.json({
         message: "Đăng nhập thành công",
@@ -54,8 +54,8 @@ class AuthController {
 
   async loginStaff(req, res, next) {
     try {
-      const { id, password } = req.body;
-      const userDTO = await AuthService.loginStaff(req, id, password);
+      const { phone, password } = req.body;
+      const userDTO = await AuthService.loginStaff(req, phone, password);
 
       res.json({
         message: "Đăng nhập thành công",

@@ -9,6 +9,10 @@ class ReaderRepository {
     return await this.collection.findOne({ _id: new ObjectId(id) });
   }
 
+  async findByPhone(phone) {
+    return await this.collection.findOne({ phone });
+  }
+
   async findAll() {
     return await this.collection.find().toArray();
   }

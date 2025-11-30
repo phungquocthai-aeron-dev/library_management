@@ -13,7 +13,7 @@ class PublisherController {
 
   async getAll(req, res) {
     try {
-      const data = await publisherService.getAll();
+      const data = await PublisherService.getAll();
       return res.json(
         ResponseDTO.success(data, "Lấy danh sách nhà xuất bản thành công")
       );
@@ -27,7 +27,7 @@ class PublisherController {
   async getById(req, res) {
     try {
       const { id } = req.params;
-      const data = await publisherService.getById(id);
+      const data = await PublisherService.getById(id);
       return res.json(
         ResponseDTO.success(data, "Lấy thông tin nhà xuất bản thành công")
       );
@@ -45,7 +45,7 @@ class PublisherController {
 
   async create(req, res) {
     try {
-      const data = await publisherService.create(req.body);
+      const data = await PublisherService.create(req.body);
       return res
         .status(201)
         .json(ResponseDTO.success(data, "Thêm nhà xuất bản thành công"));
@@ -61,7 +61,7 @@ class PublisherController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const data = await publisherService.update(id, req.body);
+      const data = await PublisherService.update(id, req.body);
       return res.json(
         ResponseDTO.success(data, "Cập nhật nhà xuất bản thành công")
       );
@@ -80,7 +80,7 @@ class PublisherController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      await publisherService.delete(id);
+      await PublisherService.delete(id);
       return res.json(ResponseDTO.success(null, "Xóa nhà xuất bản thành công"));
     } catch (err) {
       return res

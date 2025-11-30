@@ -44,7 +44,12 @@ class CirculationService {
   async returnBook(circulationId, returnDate = new Date()) {
     const circulation =
       await this.circulationRepository.findById(circulationId);
+
     if (!circulation) throw new Error("Không tìm thấy phiếu mượn");
+
+    if (circulation.status === "RETURNED") {
+      throw new Error("Sách này đã được trả trước đó");
+    }
 
     const book = await this.bookRepository.findById(circulation.bookId);
     const reader = await this.readerRepository.findById(circulation.readerId);
@@ -57,9 +62,9 @@ class CirculationService {
     const lateDays = Math.floor((returnDate - due) / (1000 * 60 * 60 * 24));
 
     let newCreditScore = reader.creditScore + 1;
-    if (lateDays > 30) newCreditScore -= 1; // trả quá hạn >30 ngày trừ 1 điểm
+    if (lateDays > 30) newCreditScore -= 1;
 
-    await this.readerRepository.update(reader.id, {
+    await this.readerRepository.update(reader._id, {
       creditScore: newCreditScore,
     });
 

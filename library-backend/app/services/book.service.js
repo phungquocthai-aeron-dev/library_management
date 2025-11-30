@@ -24,7 +24,7 @@ class BookService {
     if (file) {
       const fileName = `book_${Date.now()}${path.extname(file.originalname)}`;
       const filePath = `/uploads/images/books/${fileName}`;
-      fs.renameSync(file.path, path.join(__dirname, "../", filePath));
+      fs.renameSync(file.path, path.join(__dirname, "../../", filePath));
       data.img = filePath;
     }
     data.isActive = true;
@@ -37,14 +37,17 @@ class BookService {
 
     if (file) {
       if (existingBook.img) {
-        const oldPath = path.join(__dirname, "../", existingBook.img);
+        const oldPath = path.join(__dirname, "../../", existingBook.img);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
 
       const fileName = `book_${id}_${Date.now()}${path.extname(file.originalname)}`;
       const filePath = `/uploads/images/books/${fileName}`;
-      fs.renameSync(file.path, path.join(__dirname, "../", filePath));
+      fs.renameSync(file.path, path.join(__dirname, "../../", filePath));
+
       data.img = filePath;
+    } else {
+      delete data.img;
     }
 
     const updatedBook = await this.bookRepository.update(id, data);
@@ -58,9 +61,9 @@ class BookService {
   }
 
   async hardDelete(id) {
-    const book = await this.getById(id);
+    const book = await this.bookRepository.findById(id);
     if (book.img) {
-      const imgPath = path.join(__dirname, "../", book.img);
+      const imgPath = path.join(__dirname, "../../", book.img);
       if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
     }
     await this.bookRepository.delete(id);
@@ -70,14 +73,16 @@ class BookService {
   async search(query) {
     const { title, author } = query;
     const books = await this.bookRepository.findAll({ isActive: true });
+
     const filtered = books.filter((b) => {
-      let match = true;
-      if (title)
-        match = match && b.title.toLowerCase().includes(title.toLowerCase());
-      if (author)
-        match = match && b.author.toLowerCase().includes(author.toLowerCase());
-      return match;
+      const matchTitle =
+        title && b.title.toLowerCase().includes(title.toLowerCase());
+      const matchAuthor =
+        author && b.author.toLowerCase().includes(author.toLowerCase());
+
+      return matchTitle || matchAuthor;
     });
+
     return filtered.map((b) => new BookDTO(b));
   }
 }

@@ -13,7 +13,7 @@ class BookController {
 
   async getAll(req, res) {
     try {
-      const data = await bookService.getAll();
+      const data = await BookService.getAll();
       return res.json(
         ResponseDTO.success(data, "Lấy danh sách sách thành công")
       );
@@ -27,7 +27,7 @@ class BookController {
   async getById(req, res) {
     try {
       const { id } = req.params;
-      const data = await bookService.getById(id);
+      const data = await BookService.getById(id);
       return res.json(
         ResponseDTO.success(data, "Lấy thông tin sách thành công")
       );
@@ -42,7 +42,7 @@ class BookController {
 
   async create(req, res) {
     try {
-      const data = await bookService.create(req.body, req.file);
+      const data = await BookService.create(req.body, req.file);
       return res
         .status(201)
         .json(ResponseDTO.success(data, "Thêm sách thành công"));
@@ -58,7 +58,7 @@ class BookController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const data = await bookService.update(id, req.body, req.file);
+      const data = await BookService.update(id, req.body, req.file);
       return res.json(ResponseDTO.success(data, "Cập nhật sách thành công"));
     } catch (err) {
       return res
@@ -70,7 +70,7 @@ class BookController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      const result = await bookService.delete(id);
+      const result = await BookService.delete(id);
       return res.json(
         ResponseDTO.success(result, "Xóa sách thành công (soft delete)")
       );
@@ -86,7 +86,7 @@ class BookController {
   async hardDelete(req, res) {
     try {
       const { id } = req.params;
-      const result = await bookService.hardDelete(id);
+      const result = await BookService.hardDelete(id);
       return res.json(
         ResponseDTO.success(result, "Xóa sách hoàn toàn thành công")
       );
@@ -101,7 +101,7 @@ class BookController {
 
   async search(req, res) {
     try {
-      const data = await bookService.search(req.query);
+      const data = await BookService.search(req.query);
       return res.json(ResponseDTO.success(data, "Kết quả tìm kiếm"));
     } catch (err) {
       return res

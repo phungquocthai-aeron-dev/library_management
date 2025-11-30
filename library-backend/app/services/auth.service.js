@@ -10,8 +10,9 @@ class AuthService {
     this.staffRepository = new StaffRepository(client);
   }
   // -------------------- Login --------------------
-  async loginReader(req, id, password) {
-    const user = await this.readerRepository.findById(id);
+  async loginReader(req, phone, password) {
+    // Tìm theo số điện thoại
+    const user = await this.readerRepository.findByPhone(phone);
     if (!user) throw new Error("Độc giả không tồn tại");
     if (!user.isActive) throw new Error("Tài khoản đang bị vô hiệu hóa");
 
@@ -26,8 +27,8 @@ class AuthService {
     return new ReaderDTO(user);
   }
 
-  async loginStaff(req, id, password) {
-    const user = await this.staffRepository.findById(id);
+  async loginStaff(req, phone, password) {
+    const user = await this.staffRepository.findByPhone(phone);
     if (!user) throw new Error("Nhân viên không tồn tại");
     if (!user.isActive) throw new Error("Tài khoản đang bị vô hiệu hóa");
 
@@ -90,23 +91,29 @@ class AuthService {
 
   // -------------------- Register --------------------
   async registerReader(data) {
+    const existing = await this.readerRepository.findByPhone(data.phone);
+    if (existing) throw new Error("Số điện thoại đã được đăng ký");
+
     const hashedPassword = await bcryptUtil.hash(data.password);
     const newReader = {
       ...data,
       password: hashedPassword,
-      isActive: true, // mặc định active
-      creditScore: data.creditScore ?? 10, // mặc định 10 điểm tín nhiệm
+      isActive: true,
+      creditScore: data.creditScore ?? 10,
     };
     const created = await this.readerRepository.create(newReader);
     return new ReaderDTO(created);
   }
 
   async registerStaff(data) {
+    const existing = await this.staffRepository.findByPhone(data.phone);
+    if (existing) throw new Error("Số điện thoại đã được đăng ký");
+
     const hashedPassword = await bcryptUtil.hash(data.password);
     const newStaff = {
       ...data,
       password: hashedPassword,
-      isActive: true, // mặc định active
+      isActive: true,
     };
     const created = await this.staffRepository.create(newStaff);
     return new StaffDTO(created);

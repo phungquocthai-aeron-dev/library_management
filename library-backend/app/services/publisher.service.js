@@ -1,4 +1,3 @@
-const publisherRepository = require("../repositories/publisher.repository");
 const PublisherDTO = require("../dtos/publisher.dto");
 const PublisherRepository = require("../repositories/publisher.repository");
 
@@ -8,30 +7,30 @@ class PublisherService {
   }
 
   async getAll() {
-    const publishers = await publisherRepository.findAll();
+    const publishers = await this.publisherRepository.findAll();
     return publishers.map((pub) => new PublisherDTO(pub));
   }
 
   async getById(id) {
-    const publisher = await publisherRepository.findById(id);
+    const publisher = await this.publisherRepository.findById(id);
     if (!publisher) throw new Error("Không tìm thấy nhà xuất bản");
     return new PublisherDTO(publisher);
   }
 
   async create(data) {
-    const publisher = await publisherRepository.create(data);
+    const publisher = await this.publisherRepository.create(data);
     return new PublisherDTO(publisher);
   }
 
   async update(id, data) {
     await this.getById(id);
-    const updated = await publisherRepository.update(id, data);
+    const updated = await this.publisherRepository.update(id, data);
     return new PublisherDTO(updated);
   }
 
   async delete(id) {
     await this.getById(id);
-    return await publisherRepository.delete(id);
+    return await this.publisherRepository.delete(id);
   }
 }
 
