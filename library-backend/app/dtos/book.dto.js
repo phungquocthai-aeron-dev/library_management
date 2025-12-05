@@ -13,7 +13,7 @@ class BookDTO {
 
     this.publisherId = bookDoc.publisherId;
 
-    this.publisher = bookDoc.publisher ? bookDoc.publisher[0] : null;
+    this.publisher = bookDoc.publisher || null;
   }
 }
 

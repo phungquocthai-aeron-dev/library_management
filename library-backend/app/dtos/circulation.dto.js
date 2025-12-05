@@ -10,8 +10,8 @@ class CirculationDTO {
     this.returnDate = circulationDoc.returnDate;
     this.status = circulationDoc.status;
 
-    this.reader = circulationDoc.reader ? circulationDoc.reader[0] : null;
-    this.book = circulationDoc.book ? circulationDoc.book[0] : null;
+    this.reader = circulationDoc.reader || null;
+    this.book = circulationDoc.book || null;
   }
 }
 

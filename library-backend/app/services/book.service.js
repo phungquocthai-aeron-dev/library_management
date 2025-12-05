@@ -1,12 +1,13 @@
-const bookRepository = require("../repositories/book.repository");
 const BookDTO = require("../dtos/book.dto");
 const fs = require("fs");
 const path = require("path");
 const BookRepository = require("../repositories/book.repository");
+const PublisherRepository = require("../repositories/publisher.repository");
 
 class BookService {
   constructor(client) {
     this.bookRepository = new BookRepository(client);
+    this.publisherRepository = new PublisherRepository(client);
   }
 
   async getAll() {
@@ -17,6 +18,10 @@ class BookService {
   async getById(id) {
     const book = await this.bookRepository.findById(id);
     if (!book || !book.isActive) throw new Error("Không tìm thấy sách");
+
+    const publisher = await this.publisherRepository.findById(book.publisherId);
+    book.publisher = publisher || null;
+
     return new BookDTO(book);
   }
 

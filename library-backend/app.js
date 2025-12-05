@@ -12,7 +12,13 @@ const ApiError = require("./app/errors/api-error");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3001", "http://localhost:3002"],
+    credentials: true,
+  })
+);
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 
@@ -23,6 +29,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60,
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
     },
   })
 );
