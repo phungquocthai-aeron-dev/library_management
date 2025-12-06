@@ -42,10 +42,17 @@ class AuthController {
       const { phone, password } = req.body;
       const userDTO = await AuthService.loginReader(req, phone, password);
 
-      res.json({
-        message: "Đăng nhập thành công",
-        user: userDTO,
-        session: req.session.user,
+      req.session.user = {
+        id: userDTO.id,
+        type: "reader",
+      };
+
+      req.session.save(() => {
+        res.json({
+          message: "Đăng nhập thành công",
+          user: userDTO,
+          session: req.session.user,
+        });
       });
     } catch (e) {
       next(new ApiError(400, e.message));
@@ -57,10 +64,17 @@ class AuthController {
       const { phone, password } = req.body;
       const userDTO = await AuthService.loginStaff(req, phone, password);
 
-      res.json({
-        message: "Đăng nhập thành công",
-        user: userDTO,
-        session: req.session.user,
+      req.session.user = {
+        id: userDTO.id,
+        type: "staff",
+      };
+
+      req.session.save(() => {
+        res.json({
+          message: "Đăng nhập thành công",
+          user: userDTO,
+          session: req.session.user,
+        });
       });
     } catch (e) {
       next(new ApiError(400, e.message));
@@ -132,9 +146,9 @@ class AuthController {
 
   async updateReader(req, res, next) {
     try {
-      const { id } = req.params;
+      const userId = req.session.user.id;
       const updateData = req.body;
-      const updated = await AuthService.updateReader(id, updateData);
+      const updated = await AuthService.updateReader(userId, updateData);
       res.json({ message: "Cập nhật độc giả thành công", user: updated });
     } catch (err) {
       next(new ApiError(400, err.message));
@@ -143,10 +157,10 @@ class AuthController {
 
   async updatePasswordReader(req, res, next) {
     try {
-      const { id } = req.params;
+      const userId = req.session.user.id;
       const { oldPassword, newPassword } = req.body;
       const updated = await AuthService.updatePasswordReader(
-        id,
+        userId,
         oldPassword,
         newPassword
       );
@@ -161,9 +175,9 @@ class AuthController {
 
   async updateStaff(req, res, next) {
     try {
-      const { id } = req.params;
+      const userId = req.session.user.id;
       const updateData = req.body;
-      const updated = await AuthService.updateStaff(id, updateData);
+      const updated = await AuthService.updateStaff(userId, updateData);
       res.json({ message: "Cập nhật nhân viên thành công", user: updated });
     } catch (err) {
       next(new ApiError(400, err.message));
@@ -172,10 +186,10 @@ class AuthController {
 
   async updatePasswordStaff(req, res, next) {
     try {
-      const { id } = req.params;
+      const userId = req.session.user.id;
       const { oldPassword, newPassword } = req.body;
       const updated = await AuthService.updatePasswordStaff(
-        id,
+        userId,
         oldPassword,
         newPassword
       );

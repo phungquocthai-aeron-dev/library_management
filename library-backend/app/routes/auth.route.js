@@ -2,11 +2,6 @@ const express = require("express");
 const router = express.Router();
 const AuthController = require("../controllers/auth.controller");
 
-const {
-  requireNhanVien,
-  requireDocGia,
-} = require("../middlewares/auth.middleware");
-
 // === Register ===
 router.post("/register/reader", AuthController.registerReader);
 router.post("/register/staff", AuthController.registerStaff);
@@ -17,45 +12,21 @@ router.post("/login/staff", AuthController.loginStaff);
 router.post("/logout", AuthController.logout);
 
 // === Update info & password ===
-router.put("/staff/:id", requireNhanVien, AuthController.updateStaff);
-router.put(
-  "/staff/:id/password",
-  requireNhanVien,
-  AuthController.updatePasswordStaff
-);
-router.put("/reader/:id", requireDocGia, AuthController.updateReader);
-router.put(
-  "/reader/:id/password",
-  requireDocGia,
-  AuthController.updatePasswordReader
-);
+router.put("/reader", AuthController.updateReader);
+router.put("/reader/password", AuthController.updatePasswordReader);
+router.put("/staff", AuthController.updateStaff);
+router.put("/staff/password", AuthController.updatePasswordStaff);
 
 // === Activate / Deactivate ===
 // Reader
-router.put(
-  "/reader/:id/activate",
-  requireNhanVien,
-  AuthController.activateReader
-);
-router.put(
-  "/reader/:id/deactivate",
-  requireNhanVien,
-  AuthController.deactivateReader
-);
+router.put("/reader/:id/activate", AuthController.activateReader);
+router.put("/reader/:id/deactivate", AuthController.deactivateReader);
 
 // Staff
-router.put(
-  "/staff/:id/activate",
-  requireNhanVien,
-  AuthController.activateStaff
-);
-router.put(
-  "/staff/:id/deactivate",
-  requireNhanVien,
-  AuthController.deactivateStaff
-);
+router.put("/staff/:id/activate", AuthController.activateStaff);
+router.put("/staff/:id/deactivate", AuthController.deactivateStaff);
 
 // === Update Role (Staff) ===
-router.put("/staff/:id/role", requireNhanVien, AuthController.updateRoleStaff);
+router.put("/staff/:id/role", AuthController.updateRoleStaff);
 
 module.exports = router;

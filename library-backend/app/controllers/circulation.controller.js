@@ -28,6 +28,18 @@ class CirculationController {
     }
   }
 
+  async confirmBorrow(req, res) {
+    try {
+      const { circulationId } = req.body;
+      const data = await CirculationService.confirmBorrow(circulationId);
+      res.json(ResponseDTO.success(data, "Xác nhận mượn sách thành công"));
+    } catch (err) {
+      res
+        .status(400)
+        .json(ResponseDTO.fail({ message: err.message }, "Lỗi xác nhận mượn"));
+    }
+  }
+
   async returnBook(req, res) {
     try {
       const { circulationId, returnDate } = req.body;
@@ -43,6 +55,18 @@ class CirculationController {
     }
   }
 
+  async cancelBorrow(req, res) {
+    try {
+      const { circulationId } = req.body;
+      const data = await CirculationService.cancelBorrow(circulationId);
+      res.json(ResponseDTO.success(data, "Hủy mượn sách thành công"));
+    } catch (err) {
+      res
+        .status(400)
+        .json(ResponseDTO.fail({ message: err.message }, "Lỗi hủy mượn"));
+    }
+  }
+
   async findOverdue(req, res) {
     try {
       const data = await CirculationService.findOverdue();
@@ -54,15 +78,15 @@ class CirculationController {
     }
   }
 
-  async deactivateUser(req, res) {
+  async getByReader(req, res) {
     try {
-      const { userId, type } = req.body;
-      const data = await CirculationService.deactivateUser(userId, type);
-      res.json(ResponseDTO.success(data, "Vô hiệu hóa thành công"));
+      const { readerId } = req.params;
+      const data = await CirculationService.findByReader(readerId);
+      res.json(ResponseDTO.success(data, "Danh sách phiếu mượn của độc giả"));
     } catch (err) {
       res
         .status(400)
-        .json(ResponseDTO.fail({ message: err.message }, "Lỗi vô hiệu hóa"));
+        .json(ResponseDTO.fail({ message: err.message }, "Lỗi tìm phiếu mượn"));
     }
   }
 }

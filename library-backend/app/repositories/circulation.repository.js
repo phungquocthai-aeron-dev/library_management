@@ -54,6 +54,30 @@ class CirculationRepository {
       .toArray();
     return docs;
   }
+
+  async findByReaderId(readerId) {
+    const docs = await this.collection
+      .aggregate([
+        { $match: { readerId } },
+        {
+          $lookup: {
+            from: "book",
+            let: { bookIdStr: "$bookId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", { $toObjectId: "$$bookIdStr" }] },
+                },
+              },
+            ],
+            as: "book",
+          },
+        },
+      ])
+      .toArray();
+
+    return docs;
+  }
 }
 
 module.exports = CirculationRepository;
