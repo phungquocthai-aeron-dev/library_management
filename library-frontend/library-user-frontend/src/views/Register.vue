@@ -47,11 +47,6 @@
         </div>
 
         <div class="mb-3">
-          <label>Email *</label>
-          <input v-model="email" type="email" class="form-control" required />
-        </div>
-
-        <div class="mb-3">
           <label>Mật khẩu *</label>
           <input
             v-model="password"
@@ -84,7 +79,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import AuthService from "@/services/auth.service";
 
 export default {
   name: "RegisterReader",
@@ -95,7 +90,6 @@ export default {
       gender: "",
       address: "",
       phone: "",
-      email: "",
       password: "",
       confirmPassword: "",
     };
@@ -113,16 +107,17 @@ export default {
         gender: this.gender,
         address: this.address,
         phone: this.phone,
-        email: this.email,
         password: this.password,
       };
 
       try {
-        const res = await axios.post("/api/auth/register/reader", payload);
+        const res = await AuthService.register(payload);
 
-        if (res.data.success) {
-          alert("Đăng ký thành công!");
-          this.$router.push("/login-reader");
+        if (res.data.user) {
+          this.$router.push({
+            path: "/auth/login",
+            query: { success: "true", phone: this.phone },
+          });
         } else {
           alert(res.data.message || "Đăng ký thất bại!");
         }

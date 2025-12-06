@@ -5,16 +5,39 @@ class CirculationService {
     this.api = createApiClient(baseUrl);
   }
 
+  // Mượn sách
   borrowBook(data) {
+    // data: { readerId, bookId, borrowDate, dueDate }
     return this.api.post("/borrow", data);
   }
 
+  // Xác nhận mượn sách
+  confirmBorrow(data) {
+    // data: { circulationId }
+    return this.api.post("/confirm", data);
+  }
+
+  // Trả sách
   returnBook(data) {
+    // data: { circulationId, returnDate }
     return this.api.post("/return", data);
   }
 
+  // Hủy mượn sách
+  cancelBorrow(data) {
+    // data: { circulationId }
+    return this.api.post("/cancel", data);
+  }
+
+  // Tìm sách quá hạn
   findOverdue() {
     return this.api.get("/overdue");
+  }
+
+  // Lấy danh sách phiếu mượn theo độc giả
+  getByReader(readerId) {
+    if (!readerId) throw new Error("Thiếu readerId");
+    return this.api.get(`/reader/${readerId}`);
   }
 }
 

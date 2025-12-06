@@ -8,6 +8,10 @@
     <div class="main-content col-md-8">
       <h2>Đăng nhập Độc giả</h2>
 
+      <div v-if="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+
       <form @submit.prevent="handleLogin">
         <div class="form-group mb-3">
           <label for="login-phone">Số điện thoại</label>
@@ -54,7 +58,17 @@ export default {
       phone: "",
       password: "",
       loading: false,
+      successMessage: "",
     };
+  },
+  mounted() {
+    if (this.$route.query.success === "true") {
+      this.successMessage = "Đăng ký thành công! Vui lòng đăng nhập.";
+    }
+
+    if (this.$route.query.phone) {
+      this.phone = this.$route.query.phone;
+    }
   },
   methods: {
     async handleLogin() {
@@ -64,15 +78,12 @@ export default {
           password: this.password,
         });
 
-        console.log("Response:", res.data);
-
         if (res.data.user && res.data.session) {
           await this.$router.push({ name: "home" });
         } else {
           alert(res.data.message || "Đăng nhập thất bại!");
         }
       } catch (err) {
-        console.error("Login error:", err);
         alert(err.response?.data?.message || "Lỗi đăng nhập");
       }
     },

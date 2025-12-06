@@ -239,7 +239,7 @@ export default {
         image: b.img ? baseURL + b.img : "https://via.placeholder.com/500x700",
       }));
 
-      this.filteredBooks = [...this.books];
+      this.filteredBooks = [...this.books].reverse();
     } catch (error) {
       console.error("Lỗi khi lấy danh sách sách:", error);
     }

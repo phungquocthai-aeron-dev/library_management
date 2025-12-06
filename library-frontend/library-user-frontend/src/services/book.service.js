@@ -13,12 +13,16 @@ class BookService {
     return this.api.get(`/${id}`);
   }
 
-  search(query) {
-    return this.api.get(`/search`, { params: { q: query } });
+  search(value) {
+    return this.api.get(`/search`, {
+      params: {
+        title: value,
+        author: value,
+      },
+    });
   }
 
   create(data) {
-    // data phải là FormData vì có upload ảnh
     return this.api.post("/", data, {
       headers: { "Content-Type": "multipart/form-data" },
     });

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import AuthService from "@/services/auth.service"; // service để check login
 
 const routes = [
   {
@@ -12,9 +13,31 @@ const routes = [
         component: () => import("@/views/Home.vue"),
       },
       {
+        path: "profile",
+        name: "profile",
+        component: () => import("@/views/Profile.vue"),
+      },
+      {
         path: "book/:id",
         name: "bookDetail",
         component: () => import("@/views/BookDetail.vue"),
+      },
+      {
+        path: "search",
+        name: "searchResults",
+        component: () => import("@/views/SearchResults.vue"),
+      },
+      {
+        path: "circulation",
+        name: "circulation",
+        component: () => import("@/views/Circulation.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "profile",
+        name: "profile",
+        component: () => import("@/views/Profile.vue"),
+        meta: { requiresAuth: true },
       },
     ],
   },
@@ -45,13 +68,21 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    }
+    if (savedPosition) return savedPosition;
     return { top: 0 };
   },
+});
+
+// --- Navigation Guard ---
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.meta.requiresAuth;
+
+  if (requiresAuth && !AuthService.getCurrentReader()) {
+    next({ name: "home" });
+  } else {
+    next();
+  }
 });
 
 export default router;

@@ -12,56 +12,58 @@
       <!-- TEXT INFO -->
       <div class="col-md-8">
         <h1 class="fw-bold mb-2">{{ book.title }}</h1>
-        <p class="text-primary fs-5 mb-4">
-          <strong>Tác giả: </strong>{{ book.author }}
-        </p>
-        <!-- PRICE BOX -->
+        <p class="fs-5 mb-4"><strong>Tác giả: </strong>{{ book.author }}</p>
+
         <div class="price-section mb-4 text-white rounded-4 p-3 shadow">
           <div class="price-label">Giá sách:</div>
           <div class="price-value">{{ formatPrice(book.price) }}</div>
         </div>
-        <!-- INFO GRID -->
+
         <div class="row g-3">
           <div class="col-6">
             <div class="info-item">
-              <span class="info-label">Năm xuất bản: </span>
-              <span class="info-value">{{ book.pubYear }}</span>
+              <span class="info-label">Năm xuất bản: </span
+              ><span class="info-value">{{ book.pubYear }}</span>
             </div>
           </div>
           <div class="col-6">
             <div class="info-item">
-              <span class="info-label">Nhà xuất bản: </span>
-              <span class="info-value">{{ book.publisher?.name || "—" }} </span>
+              <span class="info-label">Nhà xuất bản: </span
+              ><span class="info-value"
+                >{{ book.publisher?.name || "—" }}
+              </span>
             </div>
           </div>
           <div class="col-6">
             <div class="info-item">
-              <span class="info-label">Số lượng: </span>
-              <span class="info-value"> {{ book.quantity }} quyển </span>
+              <span class="info-label">Số lượng: </span
+              ><span class="info-value"> {{ book.quantity }} quyển </span>
             </div>
           </div>
           <div class="col-6">
             <div class="info-item">
-              <span class="info-label">Mã sách: </span>
-              <span class="info-value">{{ book.id }}</span>
+              <span class="info-label">Mã sách: </span
+              ><span class="info-value">{{ book.id }}</span>
             </div>
           </div>
         </div>
-        <!-- ACTION BUTTON -->
+
         <div class="mt-4">
-          <button
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#borrowModal"
-          >
+          <button class="btn btn-primary" @click="showModal = true">
             Mượn sách
           </button>
-          <BorrowModal :book="book" :image="bookImage" @borrow="handleBorrow" />
+          <BorrowModal
+            :book="book"
+            :image="bookImage"
+            v-model:visible="showModal"
+            @borrow="handleBorrow"
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import BorrowModal from "@/components/BorrowModal.vue";
 import BookService from "@/services/book.service";
@@ -71,7 +73,10 @@ import AuthService from "@/services/auth.service";
 export default {
   components: { BorrowModal },
   data() {
-    return { book: {} };
+    return {
+      book: {},
+      showModal: false,
+    };
   },
   computed: {
     bookImage() {
@@ -79,12 +84,6 @@ export default {
       return this.book.img
         ? baseURL + this.book.img
         : "https://via.placeholder.com/400x600?text=No+Image";
-    },
-    availabilityClass() {
-      const q = Number(this.book.quantity);
-      if (q > 20) return "in-stock";
-      if (q > 0) return "low-stock";
-      return "out-of-stock";
     },
   },
   async mounted() {
@@ -97,28 +96,13 @@ export default {
       return Number(value).toLocaleString("vi-VN") + " ₫";
     },
     async handleBorrow(payload) {
-      const reader = AuthService.getCurrentReader();
-
-      if (!reader) {
-        alert("Bạn phải đăng nhập để mượn sách!");
-        return;
-      }
-
-      const fullPayload = {
-        readerId: reader.id,
-        ...payload,
-      };
-
-      try {
-        const res = await CirculationService.borrowBook(fullPayload);
-        alert("Mượn sách thành công!");
-      } catch (err) {
-        alert("Mượn sách thất bại!");
-      }
+      // Xử lý thêm sau khi mượn thành công nếu cần
+      console.log("Borrowed:", payload);
     },
   },
 };
 </script>
+
 <style scoped>
 .info-item {
   background: #fafaff;
@@ -142,23 +126,5 @@ export default {
 .price-value {
   font-size: 32px;
   font-weight: 700;
-}
-.availability {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.in-stock {
-  background: #d1fae5;
-  color: #065f46;
-}
-.low-stock {
-  background: #fef3c7;
-  color: #92400e;
-}
-.out-of-stock {
-  background: #fee2e2;
-  color: #991b1b;
 }
 </style>

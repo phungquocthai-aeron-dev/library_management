@@ -1,7 +1,9 @@
 <template>
   <div class="col">
     <div class="card h-100 book-card position-relative">
-      <img :src="book.image" class="card-img-top" :alt="book.title" />
+      <router-link :to="`/book/${book.id}`">
+        <img :src="book.image" class="card-img-top" :alt="book.title" />
+      </router-link>
 
       <div class="card-body">
         <router-link
