@@ -14,7 +14,7 @@
           <ul class="list-unstyled">
             <li>📞 0123 456 789</li>
             <li>📧 support@library.vn</li>
-            <li>📍 Hà Nội, Việt Nam</li>
+            <li>📍 Cần Thơ, Việt Nam</li>
           </ul>
         </div>
 
