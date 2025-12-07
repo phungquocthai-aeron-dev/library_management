@@ -50,11 +50,11 @@ export default {
     const user = ref(AuthService.getCurrentReader());
 
     const menuItems = [
-      { name: "Mượn trả", icon: "🔄", route: "circulation" },
-      { name: "Sách", icon: "📖", route: "home" },
+      { name: "Mượn trả", icon: "🔄", route: "home" },
+      { name: "Sách", icon: "📖", route: "book" },
     ];
 
-    const activeItem = ref("Sách");
+    const activeItem = ref("Mượn trả");
 
     const setActive = (name) => {
       activeItem.value = name;

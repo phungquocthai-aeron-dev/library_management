@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import AuthService from "@/services/auth.service"; // service để check login
 
 const routes = [
   {
@@ -10,12 +9,12 @@ const routes = [
       {
         path: "",
         name: "home",
-        component: () => import("@/views/Book.vue"),
+        component: () => import("@/views/Circulation.vue"),
       },
       {
-        path: "circulation",
-        name: "circulation",
-        component: () => import("@/views/Circulation.vue"),
+        path: "book",
+        name: "book",
+        component: () => import("@/views/Book.vue"),
       },
     ],
   },
