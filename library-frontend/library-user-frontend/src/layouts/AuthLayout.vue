@@ -1,7 +1,7 @@
 <template>
   <div class="auth-bg">
     <div class="auth-wrapper">
-      <router-view />
+      <router-view :key="$route.fullPath" />
     </div>
   </div>
 </template>

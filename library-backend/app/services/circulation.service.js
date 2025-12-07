@@ -9,6 +9,10 @@ class CirculationService {
     this.circulationRepository = new CirculationRepository(client);
   }
 
+  async getAll() {
+    return await this.circulationRepository.findAll();
+  }
+
   async borrowBook(readerId, bookId, borrowDate, dueDate) {
     const book = await this.bookRepository.findById(bookId);
     const reader = await this.readerRepository.findById(readerId);
@@ -29,17 +33,37 @@ class CirculationService {
       borrowDate,
       dueDate,
       returnDate: null,
-      status: "CONFIRMED",
+      status: "PENDING",
     };
 
     const created = await this.circulationRepository.create(circulation);
     return new CirculationDTO(created);
   }
 
+  async approveBorrow(circulationId, staffId) {
+    const circulation =
+      await this.circulationRepository.findById(circulationId);
+    if (!circulation) throw new Error("Không tìm thấy phiếu mượn");
+
+    if (circulation.status !== "PENDING")
+      throw new Error("Chỉ phiếu mượn PENDING mới được duyệt");
+    console.error(staffId);
+    console.log("AA");
+    const updated = await this.circulationRepository.update(circulationId, {
+      staffId,
+      status: "CONFIRMED",
+    });
+
+    return new CirculationDTO(updated);
+  }
+
   async confirmBorrow(circulationId) {
     const circulation =
       await this.circulationRepository.findById(circulationId);
     if (!circulation) throw new Error("Không tìm thấy phiếu mượn");
+
+    if (circulation.status !== "CONFIRMED")
+      throw new Error("Chỉ có phiếu mượn CONFIRMED mới được nhận sách");
 
     const updated = await this.circulationRepository.update(circulationId, {
       status: "BORROWED",
@@ -81,7 +105,10 @@ class CirculationService {
     if (circulation.status === "CANCELED")
       throw new Error("Phiếu mượn đã bị hủy");
 
-    if (circulation.status === "CONFIRMED") {
+    if (
+      circulation.status === "CONFIRMED" ||
+      circulation.status === "PENDING"
+    ) {
       // Hoàn trả lại sách
       const book = await this.bookRepository.findById(circulation.bookId);
       const reader = await this.readerRepository.findById(circulation.readerId);

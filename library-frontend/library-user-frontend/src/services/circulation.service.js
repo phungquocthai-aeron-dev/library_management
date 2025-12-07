@@ -11,6 +11,11 @@ class CirculationService {
     return this.api.post("/borrow", data);
   }
 
+  approveBorrow(data) {
+    // data: { circulationId, staffId }
+    return this.api.post("/approve", data);
+  }
+
   // Xác nhận mượn sách
   confirmBorrow(data) {
     // data: { circulationId }

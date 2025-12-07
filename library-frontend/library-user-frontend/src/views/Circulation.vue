@@ -143,6 +143,22 @@
                     </span>
                     <span v-else>❌ Hủy mượn</span>
                   </button>
+
+                  <button
+                    v-if="c.status === 'PENDING'"
+                    class="btn btn-danger btn-sm"
+                    @click="cancelBorrow(c.id)"
+                    :disabled="cancelLoading === c.id"
+                    style="border-radius: 20px"
+                  >
+                    <span v-if="cancelLoading === c.id">
+                      <span
+                        class="spinner-border spinner-border-sm me-1"
+                      ></span>
+                      Đang hủy...
+                    </span>
+                    <span v-else>❌ Hủy mượn</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -254,6 +270,11 @@ export default {
     const filters = [
       { label: "Tất cả", value: "all", btnClass: "btn-outline-primary" },
       {
+        label: "Chờ duyệt",
+        value: "pending",
+        btnClass: "btn-outline-secondary",
+      },
+      {
         label: "Chờ nhận",
         value: "confirmed",
         btnClass: "btn-outline-warning",
@@ -288,12 +309,14 @@ export default {
     }
 
     function getStatus(c) {
+      if (c.status === "PENDING") return "pending";
       if (c.status === "RETURNED") return "returned";
       if (c.status === "CONFIRMED") return "confirmed";
       if (c.status === "CANCELED") return "canceled";
 
       const today = new Date();
       const dueDate = new Date(c.dueDate);
+
       if (c.status === "BORROWED" && today > dueDate) return "overdue";
       if (c.status === "BORROWED") return "borrowed";
 
@@ -303,6 +326,7 @@ export default {
     function getStatusText(c) {
       const status = getStatus(c);
       const map = {
+        pending: "Chờ thủ thư duyệt",
         confirmed: "Chờ nhận sách",
         borrowed: "Đang mượn",
         returned: "Đã trả",

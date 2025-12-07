@@ -71,7 +71,7 @@
 
         <div class="text-center mt-3 switch-text">
           Đã có tài khoản?
-          <router-link to="/login-reader">Đăng nhập</router-link>
+          <router-link to="/auth/login">Đăng nhập</router-link>
         </div>
       </form>
     </div>

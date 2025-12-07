@@ -11,6 +11,17 @@ class CirculationController {
     }
   }
 
+  async getAll(req, res) {
+    try {
+      const data = await CirculationService.getAll();
+      res.json(
+        ResponseDTO.success(data, "Lấy danh sách phiếu mượn thành công")
+      );
+    } catch (err) {
+      res.status(400).json(ResponseDTO.fail(err.message, "Lỗi lấy danh sách"));
+    }
+  }
+
   async borrowBook(req, res) {
     try {
       const { readerId, bookId, borrowDate, dueDate } = req.body;
@@ -52,6 +63,21 @@ class CirculationController {
       res
         .status(400)
         .json(ResponseDTO.fail({ message: err.message }, "Lỗi trả sách"));
+    }
+  }
+
+  async approveBorrow(req, res) {
+    try {
+      const { circulationId, staffId } = req.body;
+
+      const data = await CirculationService.approveBorrow(
+        circulationId,
+        staffId
+      );
+
+      res.json(new ResponseDTO(200, "Duyệt phiếu mượn thành công", data));
+    } catch (err) {
+      res.status(400).json(new ResponseDTO(400, err.message));
     }
   }
 

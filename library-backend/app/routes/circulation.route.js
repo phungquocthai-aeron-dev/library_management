@@ -12,6 +12,10 @@ router.post("/cancel", CirculationController.cancelBorrow);
 
 router.get("/overdue", CirculationController.findOverdue);
 
+router.post("/approve", CirculationController.approveBorrow);
+
 router.get("/reader/:readerId", CirculationController.getByReader);
+
+router.get("/", CirculationController.getAll);
 
 module.exports = router;

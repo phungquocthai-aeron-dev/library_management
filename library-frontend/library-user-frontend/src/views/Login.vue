@@ -39,7 +39,7 @@
 
         <div class="switch-text">
           Chưa có tài khoản?
-          <router-link to="/register-reader" class="text-decoration-none"
+          <router-link to="/auth/register" class="text-decoration-none"
             >Đăng ký ngay</router-link
           >
         </div>
