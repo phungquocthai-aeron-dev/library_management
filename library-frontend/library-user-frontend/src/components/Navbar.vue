@@ -20,17 +20,62 @@
         class="collapse navbar-collapse d-flex justify-content-between align-items-center"
         id="navbarContent"
       >
-        <!-- <ul class="navbar-nav me-auto mb-2 mb-lg-0"> <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" > Danh mục </a> <ul class="dropdown-menu"> <li><a class="dropdown-item">Công nghệ thông tin</a></li> <li><a class="dropdown-item">Khoa học</a></li> <li><a class="dropdown-item">Thiếu nhi</a></li> <li><hr class="dropdown-divider" /></li> <li><a class="dropdown-item">Xem chi tiết</a></li> </ul> </li> <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" > Nhà xuất bản </a> <ul class="dropdown-menu"> <li><a class="dropdown-item">NXB Trẻ</a></li> <li><a class="dropdown-item">Alpha Books</a></li> <li><a class="dropdown-item">Kim Đồng</a></li> <li><hr class="dropdown-divider" /></li> <li><a class="dropdown-item">Xem chi tiết</a></li> </ul> </li> </ul> -->
+        <div
+          class="mx-auto position-relative"
+          style="flex: 1; max-width: 500px"
+        >
+          <form
+            class="d-flex align-items-center"
+            @submit.prevent="handleSearch"
+          >
+            <div class="input-group">
+              <input
+                v-model="searchValue"
+                class="form-control rounded-start-pill"
+                type="search"
+                placeholder="Tìm kiếm sách..."
+              />
+              <button
+                type="button"
+                @click="toggleVoiceSearch"
+                :class="['btn', 'btn-voice', { active: isListening }]"
+                :title="
+                  isListening ? 'Đang nghe...' : 'Tìm kiếm bằng giọng nói'
+                "
+              >
+                <i v-if="!isListening" class="fa-solid fa-microphone"></i>
+                <i v-else class="fa-solid fa-circle" style="color: #dc3545"></i>
+              </button>
 
-        <div class="mx-auto" style="flex: 1; max-width: 500px">
-          <form class="d-flex" @submit.prevent="handleSearch">
-            <input
-              v-model="searchValue"
-              class="form-control rounded-pill w-100"
-              type="search"
-              placeholder="Tìm kiếm sách..."
-            />
+              <button class="btn btn-primary rounded-end-pill" type="submit">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
+            </div>
           </form>
+
+          <!-- Listening indicator -->
+          <div v-if="isListening" class="listening-indicator">
+            <span class="pulse-dot"></span>
+            <span class="ms-2">Đang nghe... Hãy nói tên sách bạn muốn tìm</span>
+          </div>
+
+          <!-- Voice error -->
+          <div v-if="voiceError" class="alert alert-warning alert-sm mt-2 mb-0">
+            {{ voiceError }}
+          </div>
         </div>
 
         <!-- Avatar / login buttons -->
@@ -99,12 +144,23 @@ export default {
       currentUser: AuthService.getCurrentReader(),
       defaultAvatar,
       searchValue: "",
+      isListening: false,
+      voiceError: "",
+      recognition: null,
     };
   },
   computed: {
     isLoggedIn() {
       return AuthService.isLoggedIn();
     },
+  },
+  mounted() {
+    this.initSpeechRecognition();
+  },
+  beforeUnmount() {
+    if (this.recognition) {
+      this.recognition.stop();
+    }
   },
   methods: {
     async handleLogout() {
@@ -128,6 +184,89 @@ export default {
         console.error("Lỗi tìm kiếm:", err);
       }
     },
+
+    initSpeechRecognition() {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        console.warn("Trình duyệt không hỗ trợ Web Speech API");
+        return;
+      }
+
+      this.recognition = new SpeechRecognition();
+      this.recognition.lang = "vi-VN";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.maxAlternatives = 1;
+
+      this.recognition.onstart = () => {
+        this.isListening = true;
+        this.voiceError = "";
+      };
+
+      this.recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        this.searchValue = transcript;
+        console.log("Kết quả nhận dạng giọng nói:", transcript);
+
+        setTimeout(() => {
+          this.handleSearch();
+        }, 500);
+      };
+
+      this.recognition.onerror = (event) => {
+        this.isListening = false;
+
+        switch (event.error) {
+          case "no-speech":
+            this.voiceError = "Không phát hiện giọng nói. Vui lòng thử lại.";
+            break;
+          case "audio-capture":
+            this.voiceError = "Không tìm thấy microphone.";
+            break;
+          case "not-allowed":
+            this.voiceError = "Vui lòng cho phép truy cập microphone.";
+            break;
+          default:
+            this.voiceError = `Lỗi nhận dạng: ${event.error}`;
+        }
+
+        setTimeout(() => {
+          this.voiceError = "";
+        }, 3000);
+      };
+
+      this.recognition.onend = () => {
+        this.isListening = false;
+      };
+    },
+
+    // Bật/tắt nhận dạng giọng nói
+    toggleVoiceSearch() {
+      if (!this.recognition) {
+        this.voiceError =
+          "Trình duyệt của bạn không hỗ trợ nhận dạng giọng nói";
+        setTimeout(() => {
+          this.voiceError = "";
+        }, 3000);
+        return;
+      }
+
+      if (this.isListening) {
+        this.recognition.stop();
+      } else {
+        try {
+          this.recognition.start();
+        } catch (error) {
+          console.error("Lỗi khởi động nhận dạng giọng nói:", error);
+          this.voiceError = "Không thể khởi động nhận dạng giọng nói";
+          setTimeout(() => {
+            this.voiceError = "";
+          }, 3000);
+        }
+      }
+    },
   },
 };
 </script>
@@ -137,5 +276,79 @@ export default {
   font-weight: 700;
   color: #667eea;
   cursor: pointer;
+}
+
+.input-group {
+  position: relative;
+}
+
+.btn-voice {
+  background: white;
+  border: 1px solid #ced4da;
+  border-left: none;
+  border-right: none;
+  color: #6c757d;
+  padding: 0.375rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.btn-voice:hover {
+  background: #f8f9fa;
+  color: #495057;
+}
+
+.btn-voice.active {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  animation: pulse-animation 1.5s ease-in-out infinite;
+}
+
+.listening-indicator {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff3cd;
+  color: #856404;
+  padding: 8px 12px;
+  border-radius: 0.25rem;
+  margin-top: 5px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dc3545;
+  animation: pulse-animation 1.5s ease-in-out infinite;
+}
+
+.alert-sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes pulse-animation {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
 }
 </style>
