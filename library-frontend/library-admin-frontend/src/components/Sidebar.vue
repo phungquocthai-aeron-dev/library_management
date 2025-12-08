@@ -13,6 +13,7 @@
         :key="item.name"
         :class="['menu-item', { active: item.route === $route.name }]"
       >
+        <!-- Nếu item có route, dùng router-link -->
         <router-link
           v-if="item.route"
           :to="{ name: item.route }"
@@ -22,6 +23,7 @@
           <span>{{ item.name }}</span>
         </router-link>
 
+        <!-- Nếu item không có route, chỉ hiển thị bình thường -->
         <div v-else class="d-flex align-items-center gap-2">
           <span class="menu-icon">{{ item.icon }}</span>
           <span>{{ item.name }}</span>
@@ -52,6 +54,9 @@ export default {
     const menuItems = [
       { name: "Mượn trả", icon: "🔄", route: "home" },
       { name: "Sách", icon: "📖", route: "book" },
+      { name: "Độc giả", icon: "🧑‍🎓" }, // Không có route
+      { name: "Nhân viên", icon: "👩‍💼" }, // Không có route
+      { name: "Nhà xuất bản", icon: "🏢" }, // Không có route
     ];
 
     const activeItem = ref("Mượn trả");
