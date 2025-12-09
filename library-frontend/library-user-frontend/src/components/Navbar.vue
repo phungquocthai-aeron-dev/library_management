@@ -104,11 +104,7 @@
             />
             <ul class="dropdown-menu dropdown-menu-end">
               <li class="px-3 py-2 border-bottom">
-                <strong>{{ currentUser?.fullName }}</strong
-                ><br />
-                <small class="text-warning"
-                  >⭐ {{ currentUser?.creditScore }}</small
-                >
+                <strong>{{ currentUser?.fullName }}</strong>
               </li>
               <li>
                 <router-link to="/profile" class="dropdown-item">
